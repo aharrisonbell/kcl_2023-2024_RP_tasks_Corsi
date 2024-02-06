@@ -1,10 +1,9 @@
-%% kcl_CorsiTask
+%% kcl_myCorsi_practice
 % by AHB, started Oct 2023
+% Version 1.3 - Feb 6, 2024 (post dress rehearsal)
 % Developed for BSc Psychology/Neuroscience and Psychology Research Project
 % Uses Psychtoolbox V3
 % Corsi trials are presented in 4 blocks, 20-30 trials per block
-% practice
-
 
 %% Clear workspace and screen
 sca;
@@ -25,8 +24,6 @@ display.skipChecks = 1; % avoid Screen's timing checks and verbosity
 
 % Generate a brief display to acquire parameters
 display = OpenWindow(display);
-center  = display.resolution/2;
-boxModifier = display.resolution(1)/50;
 screenResX = display.resolution(1); 
 screenResY = display.resolution(2);
 Screen('CloseAll');
@@ -40,9 +37,10 @@ magenta= [255 0   255];
 cyan   = [0   255 255];
 yellow = [255 255 0  ];
 orange = [255 128 0  ];
-neutralColour = red;
+white =  [255 255 255];
+neutralColour = yellow;
 flipColour = blue;
-selectColour = magenta;
+selectColour = orange;
 
 % Colour codings
 zone1and2 = blue;
@@ -52,7 +50,7 @@ zone7and8 = green; % g = green
 allzones = [blue; red; magenta; green];
 
 % Establish Task Parameters
-seqlength = 2:5; % possible length of sequences
+seqlength = 2:7; % possible length of sequences
 total_number_of_blocks = 1;
 total_trials_block = 12;
 seqlength_by_blockType = [repmat(2,1,2) repmat(3,1,2) repmat(4,1,2) repmat(5,1,2) repmat(6,1,2) repmat(7,1,2);...
@@ -105,17 +103,15 @@ possibleLocations = [...
 
 %% Trial Parameters
 breaktime = 3; % countdown variable at the start of the block
-startingBlock = 1;
 
 %% Prompt screen to enter ppt info to be written in logfile name
 question = {'Participant Number:'};
-title = 'Experiment Setup';
-NumOfLines = [1 50];
+title = 'Experiment Setup - PRACTICE SESSION';
+NumOfLines = [1 75];
 prompt= inputdlg(question,title,NumOfLines);
 participantNumber  = str2double(prompt(1));
-if isempty(startingBlock)||isnan(startingBlock)
-    startingBlock = 1;
-end
+startingBlock = 1;
+
 
 % Do dummy calls to GetSecs, WaitSecs, KbCheck
 % KbCheck;
@@ -124,7 +120,6 @@ end
 
 % Initialise a response matrix
 respMat = struct('participantNumber', []);
-
 
 %% Initialise Task
 KbReleaseWait; % make sure person is not pushing down any buttons
@@ -145,8 +140,6 @@ escapeKey = KbName('Q');
 % 8) If mistake is made, decrease sequence length by 1 (to minimum of 3)
 %%% Need to confirm staircase method
 
-
-
 display = OpenWindow(display);
 center  = display.resolution/2;
 boxModifier = display.resolution(1)/50;
@@ -156,30 +149,30 @@ totalTrialExperiment = 1; % initialise total experiment trial counter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for currBlock = startingBlock:total_number_of_blocks % allows for manually starting at any block
     if currBlock == 1 % display instructions for block 1
-        instructionimg = imread('kcl_corsi_promptScreen_block1.jpg');
+        instructionimg = imread('kcl_corsi_promptScreen_practice_start.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
-        rect = [50 -250 1600 1250];
+        % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
     elseif currBlock == 2 % display instructions for block 2
         instructionimg = imread('kcl_corsi_promptScreens_block2.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
-        rect = [50 -250 1600 1250];
+        % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
     elseif currBlock == 3 % display instructions for block 3
         instructionimg = imread('kcl_corsi_promptScreens_block3.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
-        rect = [50 -250 1600 1250];
+        % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
     else % display instructions for block 4
         instructionimg = imread('kcl_corsi_promptScreens_block4.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
-        rect = [50 -250 1600 1250];
+        % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
@@ -245,7 +238,7 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
         %% 4) Collect response
         % display mouse cursor
         ShowCursor('Hand', display.windowPtr, mouseID)
-        SetMouse(0,0);
+        SetMouse(center(1),center(2));
 
         % Generate correctSequence_Locations matrix
         % (correctSequence_Locations = x_start, x_end, y_start, y_end)
@@ -265,7 +258,7 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
         % Allow user input and check for errors
         startTime = GetSecs;
         for userClicks = 1:tr_seqlength % maximum number of clicks
-            [clicks(userClicks), x(userClicks), y(userClicks), ~,clickSecs(userClicks)] = GetClicks(display.windowPtr, 0);
+            [clicks(userClicks), x(userClicks), y(userClicks), clickSecs(userClicks)] = GetClicks(display.windowPtr, 0);
 
             % Figure out which block was selected and change its colour
             for j_cp = 1:tr_seqlength
@@ -274,17 +267,30 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
                     % This is where the CLUE is inserted
                     if currBlock > 1 && j_cp < tr_seqlength
                         switch tr_zoneOrder(j_cp+1) % depends on the NEXT stimulus in the sequence
-                            case 1 | 2
+                            case 1
                                 selectColour = zone1and2;
-
-                            case 3 | 4
+                                % disp("zone1and2")
+                            case 2
+                                selectColour = zone1and2;
+                                % disp("zone1and2")
+                            case 3
                                 selectColour = zone3and4;
-
-                            case 5 | 6
+                                % disp("zone3and4")
+                            case 4
+                                selectColour = zone3and4;
+                                % disp("zone3and4")
+                            case 5
                                 selectColour = zone5and6;
-
-                            case 7 | 8
+                                % disp("zone5and6")
+                            case 6
+                                selectColour = zone5and6;
+                                % disp("zone5and6")
+                            case 7
                                 selectColour = zone7and8;
+                                % disp("zone7and8")
+                            case 8
+                                selectColour = zone7and8;
+                                % disp("zone7and8")
                         end
                     else % block = 1
                         selectColour = allzones(randperm(4,1), :); % randomly select one of the four colours
@@ -332,7 +338,28 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
     
 end % all block loop end
 
-Screen('CloseAll');
-
 %% save data
-save(['PRACTICE_kcl_corsi_ppt_' , num2str(participantNumber), '_', datestr(now,'mmmm-dd-yyyy_HH-MM-SS-FFF AM'), '.mat'],'respMat') %#ok<*DLMWT>
+save(['PRACTICE_kcl_corsi_ppt_' , num2str(participantNumber), '_', datestr(now,'mmmm-dd-yyyy_HH-MM-SS-FFF AM'), '.mat'],'respMat') %#ok<*TNOW1,*DATST,*DLMWT>
+
+debriefimg = imread('kcl_corsi_promptScreen_practice_debrief.jpg');
+texI = Screen('MakeTexture', display.windowPtr, debriefimg);
+rect = [50 -250 1600 1250];
+Screen('DrawTexture', display.windowPtr, texI) %, rect);
+Screen('Flip',display.windowPtr);
+KbWait();
+
+Screen('CloseAll');
+return
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% IF THE KEYBOARD DOESN'T WORK AFTER PTB CRASHES TRY RUNNING THE FOLLOWING LINE OF CODE
+% BY HIGHLIGHTING THIS TEXT AND RIGHT-CLICKING -> EVALUATE SELECTION IN COMMAND WINDOW
+ListenChar(1); %#ok<*UNRCH>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% IF THE PROGRAM CRASHES BETWEEN BLOCKS - DO THE FOLLOWING TO SAVE THE EXISTING DATA
+% BY HIGHLIGHTING THIS TEXT AND RIGHT-CLICKING -> EVALUATE SELECTION IN COMMAND WINDOW
+saveAfterCrash_Corsi;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
