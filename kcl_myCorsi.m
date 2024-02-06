@@ -383,7 +383,7 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
 end % all block loop end
 
 %% save data
-save(['kcl_corsi_ppt_' , num2str(participantNumber), '_', datestr(now,'mmmm-dd-yyyy_HH-MM-SS-FFF AM'), '.mat'],'respMat') %#ok<*TNOW1,*DATST,*DLMWT>
+save(['kcl_corsi_ppt_' , num2str(participantNumber), '_', datestr(now,'mmmm-dd-yyyy_HH-MM-SS AM'), '.mat'],'respMat') %#ok<*TNOW1,*DATST,*DLMWT>
 
 debriefimg = imread('kcl_corsi_promptScreen_debrief.jpg');
 texI = Screen('MakeTexture', display.windowPtr, debriefimg);
