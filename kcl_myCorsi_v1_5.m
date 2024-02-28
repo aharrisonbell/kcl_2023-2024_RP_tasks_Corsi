@@ -1,6 +1,9 @@
-%% kcl_myCorsi_practice
+%% kcl_CorsiTask
+clearvars;
 % by AHB, started Oct 2023
 % Version 1.3 - Feb 6, 2024 (post dress rehearsal)
+%task_version = 1.4; % Version 1.4 - Feb 16, 2024 (post dress rehearsal. post tweaking)
+task_version = 1.5; % Version 1.5 - Feb 20, 2024 (changed debrief)
 % Developed for BSc Psychology/Neuroscience and Psychology Research Project
 % Uses Psychtoolbox V3
 % Corsi trials are presented in 4 blocks, 20-30 trials per block
@@ -8,7 +11,7 @@
 %% Clear workspace and screen
 sca;
 close all;
-clearvars;
+
 
 %% Setup PTB with some default values
 PsychDefaultSetup(2);
@@ -24,13 +27,13 @@ display.skipChecks = 1; % avoid Screen's timing checks and verbosity
 
 % Generate a brief display to acquire parameters
 display = OpenWindow(display);
-screenResX = display.resolution(1); 
+screenResX = display.resolution(1);
 screenResY = display.resolution(2);
 Screen('CloseAll');
 
 %% Set up stimulus and task parameters
 % colours
-red    = [255 0   0  ]; 
+red    = [255 0   0  ];
 blue   = [100 175 255]; % light blue
 green  = [0   255 0  ];
 magenta= [255 0   255];
@@ -50,13 +53,13 @@ zone7and8 = green; % g = green
 allzones = [blue; red; magenta; green];
 
 % Establish Task Parameters
-seqlength = 2:7; % possible length of sequences
-total_number_of_blocks = 1;
-total_trials_block = 12;
-seqlength_by_blockType = [repmat(2,1,2) repmat(3,1,2) repmat(4,1,2) repmat(5,1,2) repmat(6,1,2) repmat(7,1,2);...
-    repmat(2,1,2) repmat(3,1,2) repmat(4,1,2) repmat(5,1,2) repmat(6,1,2) repmat(7,1,2);...
-    repmat(2,1,2) repmat(3,1,2) repmat(4,1,2) repmat(5,1,2) repmat(6,1,2) repmat(7,1,2);...
-    repmat(2,1,2) repmat(3,1,2) repmat(4,1,2) repmat(5,1,2) repmat(6,1,2) repmat(7,1,2)];
+seqlength = 5:8; % possible length of sequences
+total_number_of_blocks = 4;
+total_trials_block = 28;
+seqlength_by_blockType = [repmat(5,1,7) repmat(6,1,7) repmat(7,1,7) repmat(8,1,7);... % 7 repeats of seqlengths between 5-8
+    repmat(5,1,7) repmat(6,1,7) repmat(7,1,7) repmat(8,1,7);...
+    repmat(5,1,7) repmat(6,1,7) repmat(7,1,7) repmat(8,1,7);...
+    repmat(5,1,7) repmat(6,1,7) repmat(7,1,7) repmat(8,1,7)];
 
 % Timings
 displayArrayDuration = 2; % display initial array for x s
@@ -105,13 +108,16 @@ possibleLocations = [...
 breaktime = 3; % countdown variable at the start of the block
 
 %% Prompt screen to enter ppt info to be written in logfile name
-question = {'Participant Number:'};
-title = 'Experiment Setup - PRACTICE SESSION';
-NumOfLines = [1 75];
+question = {'Participant Number:'; 'Block Number'};
+title = 'Experiment Setup';
+NumOfLines = [1 75; 1 75];
 prompt= inputdlg(question,title,NumOfLines);
 participantNumber  = str2double(prompt(1));
-startingBlock = 1;
+startingBlock = str2double(prompt(2));
 
+if isempty(startingBlock)||isnan(startingBlock)
+    startingBlock = 1;
+end
 
 % Do dummy calls to GetSecs, WaitSecs, KbCheck
 % KbCheck;
@@ -145,32 +151,41 @@ center  = display.resolution/2;
 boxModifier = display.resolution(1)/50;
 totalTrialExperiment = 1; % initialise total experiment trial counter
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for currBlock = startingBlock:total_number_of_blocks % allows for manually starting at any block
     if currBlock == 1 % display instructions for block 1
-        instructionimg = imread('kcl_corsi_promptScreen_practice_start.jpg');
+        instructionimg = imread('kcl_corsi_promptScreen_block1.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
         % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
+
     elseif currBlock == 2 % display instructions for block 2
-        instructionimg = imread('kcl_corsi_promptScreens_block2.jpg');
+        instructionimg = imread('kcl_corsi_promptScreen_block2.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
         % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
+
     elseif currBlock == 3 % display instructions for block 3
-        instructionimg = imread('kcl_corsi_promptScreens_block3.jpg');
+        instructionimg = imread('kcl_corsi_promptScreen_block3.jpg');
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
         % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
         Screen('Flip',display.windowPtr);
         KbWait();
+
     else % display instructions for block 4
-        instructionimg = imread('kcl_corsi_promptScreens_block4.jpg');
+        instructionimg = imread('kcl_corsi_promptScreen_block4_part1.jpg');
+        texI = Screen('MakeTexture', display.windowPtr, instructionimg);
+        % rect = [50 -250 1600 1250];
+        Screen('DrawTexture', display.windowPtr, texI) %, rect);
+        Screen('Flip',display.windowPtr);
+        KbStrokeWait;
+
+        instructionimg = imread('kcl_corsi_promptScreen_block4_part2.jpg'); 
         texI = Screen('MakeTexture', display.windowPtr, instructionimg);
         % rect = [50 -250 1600 1250];
         Screen('DrawTexture', display.windowPtr, texI) %, rect);
@@ -187,12 +202,12 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
 
     %% Starting Trial Block
     for t = 1:total_trials_block
-        HideCursor;     
-        
+        HideCursor;
+
         %% 00) Establish Trial Parameters and eequence
         tr_seqlength = blockseq_lengths(t); % TEMPORARY - for testing purposes sequence_length for trial t
         tr_corsiPattern = nan(tr_seqlength,2);
-     
+
         % Generate trial sequence
         clear tr_zoneOrder rect cp
         if tr_seqlength <= 8
@@ -203,7 +218,7 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
         rect = nan(4, tr_seqlength);
         for cp = 1:tr_seqlength % set through each stim in the corsi pattern (cp)
             temp = randperm(4,1); % randomiser for stimulus within zone location (1-4)
-            
+
             tr_corsiPattern(cp,[1,2]) = possibleLocations(possibleLocations(:,1)==tr_zoneOrder(cp) & ... % select zone
                 possibleLocations(:,2)==temp,[3,4]); % select random configuration of stimuli ~~ stim location within zone
 
@@ -265,6 +280,8 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
                 if x(userClicks) > rect(1, j_cp) && x(userClicks) < rect(3, j_cp) && ...
                         y(userClicks) > rect(2, j_cp) && y(userClicks) < rect(4, j_cp)
                     % This is where the CLUE is inserted
+
+
                     if currBlock > 1 && j_cp < tr_seqlength
                         switch tr_zoneOrder(j_cp+1) % depends on the NEXT stimulus in the sequence
                             case 1
@@ -294,7 +311,6 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
                         end
                     else % block = 1
                         selectColour = allzones(randperm(4,1), :); % randomly select one of the four colours
-
                     end
                     Screen('FillRect', display.windowPtr, selectColour, rect(:, j_cp))
                     Screen('Flip',display.windowPtr, [], 1);
@@ -324,24 +340,56 @@ for currBlock = startingBlock:total_number_of_blocks % allows for manually start
         respMat(totalTrialExperiment).totalTrialExperiment = totalTrialExperiment; % trial number within experiment
         respMat(totalTrialExperiment).currBlock = currBlock; % current block
         respMat(totalTrialExperiment).trialWithinBlock = t; % trial within block
-        respMat(totalTrialExperiment).trialSequenceLength = tr_seqlength; % sequence length
-        respMat(totalTrialExperiment).tr_zoneOrder = tr_zoneOrder; 
+        respMat(totalTrialExperiment).trialSequenceLength = tr_seqlength; % sequence length 
+        respMat(totalTrialExperiment).tr_zoneOrder = tr_zoneOrder;
         respMat(totalTrialExperiment).tr_corsiPattern = tr_corsiPattern;
         respMat(totalTrialExperiment).correctSequence_Locations = temp_correctSequence_Locations;
         respMat(totalTrialExperiment).clickTimes = clickTimes;
         respMat(totalTrialExperiment).errorIndex = errorIndex;
+        respMat(totalTrialExperiment).task_version = task_version;
         % what else?
         totalTrialExperiment = totalTrialExperiment + 1;
 
     end % individual block loop
+    saveAfterCrash_Corsi; % save data after each block ... just in case
+    %% DISPLAY END OF BLOCK SCREEN
+    if currBlock == 1 % display instructions for block 1
+        instructionimg = imread('kcl_corsi_promptScreen_block1end.jpg');
+        texI = Screen('MakeTexture', display.windowPtr, instructionimg);
+        % rect = [50 -250 1600 1250];
+        Screen('DrawTexture', display.windowPtr, texI) %, rect);
+        Screen('Flip',display.windowPtr);
+        KbStrokeWait;
+    elseif currBlock == 2 % display instructions for block 2
+        instructionimg = imread('kcl_corsi_promptScreen_block2end.jpg');
+        texI = Screen('MakeTexture', display.windowPtr, instructionimg);
+        % rect = [50 -250 1600 1250];
+        Screen('DrawTexture', display.windowPtr, texI) %, rect);
+        Screen('Flip',display.windowPtr);
+        KbStrokeWait;
+    elseif currBlock == 3 % display instructions for block 3
+        instructionimg = imread('kcl_corsi_promptScreen_block3end.jpg');
+        texI = Screen('MakeTexture', display.windowPtr, instructionimg);
+        % rect = [50 -250 1600 1250];
+        Screen('DrawTexture', display.windowPtr, texI) %, rect);
+        Screen('Flip',display.windowPtr);
+        KbStrokeWait;
+    % else % display instructions for block 4
+    %     instructionimg = imread('kcl_corsi_promptScreen_block4_part.jpg');
+    %     texI = Screen('MakeTexture', display.windowPtr, instructionimg);
+    %     % rect = [50 -250 1600 1250];
+    %     Screen('DrawTexture', display.windowPtr, texI) %, rect);
+    %     Screen('Flip',display.windowPtr);
+    %     KbWait();
+    end
 
-    
+
 end % all block loop end
 
 %% save data
-save(['PRACTICE_kcl_corsi_ppt_' , num2str(participantNumber), '_', datestr(now,'mmmm-dd-yyyy_HH-MM-SS AM'), '.mat'],'respMat') %#ok<*TNOW1,*DATST,*DLMWT>
+save(['kcl_corsi_ppt_' , num2str(participantNumber), '_', datestr(now,'mmmm-dd-yyyy_HH-MM-SS AM'), '.mat'],'respMat') %#ok<*TNOW1,*DATST,*DLMWT>
 
-debriefimg = imread('kcl_corsi_promptScreen_practice_debrief.jpg');
+debriefimg = imread('kcl_corsi_promptScreen_debrief.jpg');
 texI = Screen('MakeTexture', display.windowPtr, debriefimg);
 rect = [50 -250 1600 1250];
 Screen('DrawTexture', display.windowPtr, texI) %, rect);
@@ -353,13 +401,13 @@ return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % IF THE KEYBOARD DOESN'T WORK AFTER PTB CRASHES TRY RUNNING THE FOLLOWING LINE OF CODE
 % BY HIGHLIGHTING THIS TEXT AND RIGHT-CLICKING -> EVALUATE SELECTION IN COMMAND WINDOW
-ListenChar(1); %#ok<*UNRCH>
+%ListenChar(1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % IF THE PROGRAM CRASHES BETWEEN BLOCKS - DO THE FOLLOWING TO SAVE THE EXISTING DATA
 % BY HIGHLIGHTING THIS TEXT AND RIGHT-CLICKING -> EVALUATE SELECTION IN COMMAND WINDOW
-saveAfterCrash_Corsi;
+%saveAfterCrash_Corsi;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
