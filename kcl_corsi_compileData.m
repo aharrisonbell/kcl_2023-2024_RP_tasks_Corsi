@@ -13,7 +13,7 @@ clearvars
 if ispc % if this program is run on a windows PC
     rootdir='C:\Users\K...\OneDrive - King''s College London\MATLAB';
 else % if this program is run on a macbook
-    rootdir='~/OneDrive - King''s College London/MATLAB/currentProjects/proj_Corsi/corsiData';
+    rootdir='~/OneDrive - King''s College London/MATLAB/kcl_MATLAB_Projects/proj_Corsi/corsiData';
 end
 
 %% find datafiles
@@ -83,6 +83,7 @@ rawData(:,8:end) = [];
 save([rootdir, filesep, 'kcl_corsi_RawData_', date, '_', num2str(numel(datafiles)), 'files.mat'], 'rawData')
 % writematrix(rawData, [rootdir, filesep, 'kcl_corsi_RawData_', date, '_', num2str(numel(datafiles)), 'files.csv']) %#ok<*DATE>
 %writecell({datafiles.name}', [rootdir, filesep, 'kcl_corsi_RawData_', date, '_list_of_files.csv'])
+
 
 %% Scroll through each participant to generate summary statistics
 individualParticipants = unique(rawData(:,1));
